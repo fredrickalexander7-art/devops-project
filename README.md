@@ -57,7 +57,6 @@ cd devops-project
 2. Create Kubernetes cluster:
 ```bash
 kind create cluster --name devops-project
-kubectl get nodes
 ```
 
 3. Build Docker image:
@@ -74,14 +73,12 @@ kind load docker-image devops-app:latest --name devops-project
 ```bash
 kubectl apply -f kubernetes/deployment.yaml
 kubectl apply -f kubernetes/service.yaml
-kubectl get pods
 ```
 
 6. Access the application:
 ```bash
 kubectl port-forward svc/devops-app-service 8080:80 &
 curl http://localhost:8080/
-curl http://localhost:8080/health
 ```
 
 ## Project Structure
@@ -100,78 +97,39 @@ devops-project/
 │ └── outputs.tf # Terraform outputs
 ├── .github/
 │ └── workflows/
-│ └── build-and-deploy.yml # GitHub Actions CI/CD
-└── README.md # This file
+│ └── build-and-deploy.yml
+└── README.md
 
 ## Key Features
 
-✅ **Multi-Replica Kubernetes Deployment** - 2 replicas for high availability and load balancing
-
-✅ **Health Checks & Liveness Probes** - Kubernetes continuously monitors /health endpoint and auto-restarts failed pods
-
-✅ **Docker Containerization** - Lightweight Python 3.9-slim base image, optimized for production
-
-✅ **GitHub Actions CI/CD** - Automatic Docker builds and endpoint testing on every push to main
-
-✅ **Environment Variable Support** - Configure app behavior across dev/test/prod environments
-
-✅ **Infrastructure as Code** - Terraform for AWS VPC, security groups, and networking
-
-✅ **Professional Documentation** - Complete setup guides, troubleshooting, and deployment instructions
+✅ Multi-Replica Kubernetes Deployment
+✅ Health Checks & Liveness Probes
+✅ Docker Containerization
+✅ GitHub Actions CI/CD
+✅ Environment Variable Support
+✅ Infrastructure as Code (Terraform)
 
 ## CI/CD Pipeline
 
-GitHub Actions workflow automatically:
-1. Triggers on every push to main branch
-2. Builds Docker image with commit SHA tag
-3. Tests by running container and hitting endpoints
-4. Validates /health endpoint responds correctly
-5. Reports results in GitHub Actions tab
+GitHub Actions automatically builds, tests, and validates on every push to main.
 
-View workflow runs: https://github.com/fredrickalexander7-art/devops-project/actions
+View runs: https://github.com/fredrickalexander7-art/devops-project/actions
 
 ## Deployment Guide
-
-### Kubernetes Deployment Details
-
-**Deployment Manifest** (kubernetes/deployment.yaml):
-- 2 replicas for redundancy
-- Flask app on port 5000
-- Liveness probe checks /health every 10 seconds
-- Automatic restart on unhealthy pods
-
-**Service Manifest** (kubernetes/service.yaml):
-- LoadBalancer type for external access
-- Port 80 → 5000 routing
-- Distributes traffic across replicas
 
 ### Testing the Deployment
 
 ```bash
-# Check deployment status
-kubectl get deployment devops-app
-kubectl describe deployment devops-app
-
-# Check running pods
-kubectl get pods -l app=devops-app
+kubectl get pods
 kubectl logs -l app=devops-app
-
-# Test endpoints
 curl http://localhost:8080/
-# Response: {"environment": "dev", "message": "Hello from DevOps!", "status": "running"}
-
 curl http://localhost:8080/health
-# Response: {"status": "healthy"}
 ```
 
 ### Scaling Replicas
 
 ```bash
-# Scale to 5 replicas
 kubectl scale deployment devops-app --replicas=5
-
-# Scale back to 2
-kubectl scale deployment devops-app --replicas=2
 ```
 
 ## Troubleshooting
@@ -184,33 +142,16 @@ kubectl logs <pod-name>
 
 **Image not loading?**
 ```bash
-docker images | grep devops-app
 kind load docker-image devops-app:latest --name devops-project
-```
-
-**Port-forward not working?**
-```bash
-pkill -f port-forward
-kubectl port-forward svc/devops-app-service 8080:80 &
 ```
 
 ## Future Enhancements
 
-- [ ] Add database integration (PostgreSQL)
-- [ ] Implement Helm charts for easier deployment
-- [ ] Multi-environment support (dev/test/prod)
-- [ ] Add monitoring/logging (Prometheus, ELK)
-- [ ] Deploy to AWS EKS
-- [ ] Add ConfigMaps and Secrets management
-- [ ] Implement network policies
-- [ ] Add resource limits and requests
-
-## Resources
-
-- [Kubernetes Documentation](https://kubernetes.io/docs/)
-- [Docker Documentation](https://docs.docker.com/)
-- [GitHub Actions](https://github.com/features/actions)
-- [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
+- Add database integration (PostgreSQL)
+- Implement Helm charts
+- Multi-environment support (dev/test/prod)
+- Add monitoring/logging (Prometheus, ELK)
+- Deploy to AWS EKS
 
 ## Author
 
